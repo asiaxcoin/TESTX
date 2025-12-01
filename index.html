@@ -9,128 +9,51 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
 
   <style>
-    :root {
-      --bg: linear-gradient(135deg, #0a001f, #1a0033, #000428);
-      --card: rgba(15, 5, 60, 0.85);
-      --glass: rgba(255, 255, 255, 0.08);
-      --border: rgba(0, 212, 255, 0.4);
-      --red: #ff0040; --green: #00ff88; --yellow: #ffff00; --blue: #0088ff;
-      --accent: #00d4ff; --gold: #ffd700;
-    }
+    :root { --bg: linear-gradient(135deg, #0a001f, #1a0033, #000428); --card: rgba(15, 5, 60, 0.85); --glass: rgba(255, 255, 255, 0.08); --border: rgba(0, 212, 255, 0.4); --red: #ff0040; --green: #00ff88; --yellow: #ffff00; --blue: #0088ff; --accent: #00d4ff; --gold: #ffd700; }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: var(--bg); color: #e8f0ff; font-family: 'Poppins', sans-serif;
-      min-height: 100vh; overflow-x: hidden;
-    }
+    body { background: var(--bg); color: #e8f0ff; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
     .app { max-width: 420px; margin: 0 auto; padding: 12px; min-height: 100vh; }
-
-    .header {
-      text-align: center; padding: 16px; border-radius: 25px; background: var(--glass);
-      border: 2px solid var(--border); backdrop-filter: blur(20px); margin-bottom: 16px;
-      box-shadow: 0 10px 30px rgba(0,212,255,0.2);
-    }
+    .header { text-align: center; padding: 16px; border-radius: 25px; background: var(--glass); border: 2px solid var(--border); backdrop-filter: blur(20px); margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,212,255,0.2); }
     .logo { height: 55px; filter: drop-shadow(0 0 10px #00d4ff); }
-
-    .balance-card {
-      background: var(--glass); border-radius: 20px; padding: 18px; text-align: center;
-      border: 2px solid var(--border); backdrop-filter: blur(15px); margin-bottom: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    }
+    .balance-card { background: var(--glass); border-radius: 20px; padding: 18px; text-align: center; border: 2px solid var(--border); backdrop-filter: blur(15px); margin-bottom: 16px; }
     .balance { font-size: 2.2rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px #ffd700; }
-
-    .game-card {
-      background: var(--card); border-radius: 28px; padding: 25px; text-align: center;
-      border: 3px solid var(--border); box-shadow: 0 15px 40px rgba(0,212,255,0.3);
-      margin-bottom: 16px;
-    }
-    .title {
-      font-size: 1.9rem; font-weight: 900; margin-bottom: 20px;
-      background: linear-gradient(45deg, #00d4ff, #00ff88);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-
-    .bet-buttons {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;
-    }
-    .bet-btn {
-      background: rgba(255,255,255,0.1); color: white; border: 2px solid var(--border);
-      padding: 12px 20px; border-radius: 50px; font-weight: bold; min-width: 70px;
-      transition: all 0.3s;
-    }
+    .game-card { background: var(--card); border-radius: 28px; padding: 25px; text-align: center; border: 3px solid var(--border); box-shadow: 0 15px 40px rgba(0,212,255,0.3); margin-bottom: 16px; }
+    .title { font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(45deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .bet-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
+    .bet-btn { background: rgba(255,255,255,0.1); color: white; border: 2px solid var(--border); padding: 12px 20px; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
     .bet-btn.active { background: linear-gradient(45deg, #00d4ff, #00ff88); color: black; transform: translateY(-5px); }
-
-    .colours {
-      display: flex; justify-content: center; gap: 18px; margin: 30px 0;
-    }
-    .colour {
-      width: 95px; height: 95px; border-radius: 50%; font-size: 2.4rem; font-weight: bold;
-      border: 6px solid; box-shadow: 0 0 35px; transition: all 0.4s; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .colours { display: flex; justify-content: center; gap: 18px; margin: 30px 0; }
+    .colour { width: 95px; height: 95px; border-radius: 50%; font-size: 2.4rem; font-weight: bold; border: 6px solid; box-shadow: 0 0 35px; transition: all 0.4s; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .red { background: var(--red); border-color: #ff3366; box-shadow: 0 0 50px var(--red); }
     .green { background: #00ff88; border-color: #33ffaa; box-shadow: 0 0 50px var(--green); }
     .yellow { background: var(--yellow); border-color: #ffff66; box-shadow: 0 0 50px var(--yellow); color: #000; }
     .blue { background: var(--blue); border-color: #3399ff; box-shadow: 0 0 50px var(--blue); }
-
-    .colour.selected {
-      transform: scale(1.25); animation: bounce 0.6s; box-shadow: 0 0 80px !important;
-    }
+    .colour.selected { transform: scale(1.25); animation: bounce 0.6s; }
     @keyframes bounce { 0%,100% { transform: scale(1.25); } 50% { transform: scale(1.4); } }
-
-    .play-btn {
-      background: linear-gradient(45deg, #00ff88, #00d4ff, #ff00aa);
-      color: black; font-weight: 900; font-size: 1.6rem; padding: 20px;border-radius: 60px; border: none; width: 100%; margin: 25px 0;
-      box-shadow: 0 0 50px rgba(0,255,136,0.8); animation: glow 2s infinite;
-    }
+    .play-btn { background: linear-gradient(45deg, #00ff88, #00d4ff, #ff00aa); color: black; font-weight: 900; font-size: 1.6rem; padding: 20px; border-radius: 60px; border: none; width: 100%; margin: 25px 0; box-shadow: 0 0 50px rgba(0,255,136,0.8); animation: glow 2s infinite; }
     @keyframes glow { 0%,100% { box-shadow: 0 0 50px rgba(0,255,136,0.8); } 50% { box-shadow: 0 0 80px rgba(0,255,136,1); } }
-
-    .result {
-      padding: 22px; border-radius: 22px; font-size: 1.7rem; font-weight: 900; margin: 15px 0;
-      min-height: 85px; display: none; align-items: center; justify-content: center;
-      border: 4px solid; animation: pop 0.7s;
-    }
-    @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    .result { padding: 22px; border-radius: 22px; font-size: 1.7rem; font-weight: 900; margin: 15px 0; min-height: 85px; display: none; align-items: center; justify-content: center; border: 4px solid; animation: pop 0.7s; text-align: center; }@keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .win { background: rgba(0,255,136,0.3); border-color: var(--green); color: var(--green); }
     .lose { background: rgba(255,0,64,0.3); border-color: var(--red); color: var(--red); }
-
-    .history, .mission {
-      background: var(--glass); border-radius: 18px; padding: 16px; margin: 12px 0;
-      border: 2px solid var(--border); text-align: center;
-    }
-    .history-item {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
-    }
-    .history-item {
-      width: 45px; height: 45px; border-radius: 50%; font-size: 1.4rem;
-      line-height: 45px; font-weight: bold; color: black;
-    }
-
+    .history, .mission { background: var(--glass); border-radius: 18px; padding: 16px; margin: 12px 0; border: 2px solid var(--border); text-align: center; }
+    .history-item { display: inline-flex; width: 45px; height: 45px; border-radius: 50%; margin: 5px; font-size: 1.4rem; line-height: 45px; font-weight: bold; color: black; align-items: center; justify-content: center; }
     .progress-bar { height: 14px; background: rgba(0,0,0,0.5); border-radius: 7px; overflow: hidden; margin: 10px 0; }
     .progress { height: 100%; background: linear-gradient(90deg, #ffd700, #ff6b00); border-radius: 7px; width: 0%; transition: width 1s; }
-
-    .connect-btn {
-      background: linear-gradient(135deg, #00d4ff, #00ff88); color: black;
-      font-weight: 900; padding: 20px; border-radius: 60px; border: none; width: 100%;
-      font-size: 1.5rem; box-shadow: 0 0 50px rgba(0,212,255,0.7);
-    }
+    .connect-btn { background: linear-gradient(135deg, #00d4ff, #00ff88); color: black; font-weight: 900; padding: 20px; border-radius: 60px; border: none; width: 100%; font-size: 1.5rem; box-shadow: 0 0 50px rgba(0,212,255,0.7); }
   </style>
 </head>
 <body>
   <div class="app">
-
     <div class="header">
       <img src="prologo.png" class="logo" alt="ASIAX" />
       <h3>Colour Prediction Game</h3>
     </div>
 
     <div id="connectSection">
-      <button onclick="connectWallet()" class="connect-btn">
-        CONNECT WALLET
-      </button>
+      <button onclick="connectWallet()" class="connect-btn">CONNECT WALLET</button>
     </div>
 
     <div id="gameSection" style="display:none;">
-
       <div class="balance-card">
         <div style="font-size:0.95rem; color:#00d4ff;">ASIAX Balance</div>
         <div class="balance" id="balance">0.00</div>
@@ -138,15 +61,14 @@
       </div>
 
       <div class="game-card">
-        <h2 class="title">CHOOSE YOUR COLOUR</h2>
-
+        <h2 class="title">PREDICT & WIN BIG</h2>
         <div class="bet-buttons">
-          <button class="bet-btn active" onclick="setBet(1)">1</button>
-          <button class="bet-btn" onclick="setBet(2)">2</button>
-          <button class="bet-btn" onclick="setBet(5)">5</button>
-          <button class="bet-btn" onclick="setBet(10)">10</button>
-          <button class="bet-btn" onclick="setBet(15)">15</button>
-          <button class="bet-btn" onclick="setBet(20)">20</button>
+          <button class="bet-btn active" onclick="setBet(10)">10</button>
+          <button class="bet-btn" onclick="setBet(50)">50</button>
+          <button class="bet-btn" onclick="setBet(100)">100</button>
+          <button class="bet-btn" onclick="setBet(500)">500</button>
+          <button class="bet-btn" onclick="setBet(1000)">1000</button>
+          <button class="bet-btn" onclick="setBet(5000)">5000</button>
         </div>
 
         <div class="colours">
@@ -156,16 +78,13 @@
           <div class="colour blue" onclick="selectColour(3, this)">B</div>
         </div>
 
-        <button onclick="playNow()" class="play-btn" id="playBtn">
-          PLAY NOW
-        </button>
-
+        <button onclick="playNow()" class="play-btn" id="playBtn">PLAY NOW</button>
         <div id="result" class="result"></div>
       </div>
 
       <div class="history">
         <strong>Last 20 Results:</strong><br>
-        <div id="historyList"></div>
+        <div id="historyList" style="margin-top:10px;"></div>
       </div>
 
       <div class="mission">
@@ -173,44 +92,35 @@
         <div class="progress-bar"><div id="progress" class="progress"></div></div>
         <button onclick="claimReward()" class="btn btn-warning mt-2">CLAIM REWARD</button>
       </div>
-
     </div>
   </div>
 
   <script>
-    // YAHAN APNA DATA DAALO
-    const CONTRACT_ADDRESS = "0x7B6197B1b9434C017F96E33aCD2A3E3B0510e42a"; // YOUR GAME CONTRACT
-    const ASIAX_TOKEN = "0xe36b5223d488322fac2ddda937e5ab226e83fbbd"; // ASIAX COIN 18 DECIMAL KA ADDRESS
-    const ABI = [
+    // APNA DATA YAHAN DAALO
+    const CONTRACT_ADDRESS = "0x7B6197B1b9434C017F96E33aCD2A3E3B0510e42a";  // ← TERA CONTRACT
+    const ASIAX_TOKEN      = "0xe36b5223d488322fac2ddda937e5ab226e83fbbd";               // ← TERA TOKEN
+
+    const FULL_ABI = [
       "function play(uint256 amount, uint8 choice)",
-      "function autoPlay(uint256 amount, uint8 choice, uint256 rounds)",
       "function claimDailyReward()",
       "function daily(address) view returns (uint256 plays, uint256 lastReset)",
       "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)"
     ];
 
-    const TOKEN_ABI = [
-      "function balanceOf(address) view returns (uint256)",
-      "function approve(address spender, uint256 amount) returns (bool)",
-      "function allowance(address owner, address spender) view returns (uint256)"
-    ];
+    const TOKEN_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"];
 
-    let provider, signer, contract, tokenContract, account;
-    let selectedColour = null;
-    let currentBet = 10;
-    const history = [];
-
-    async function connectWallet() {
-      if (!window.ethereum) return alert("MetaMask Install Karo Bhai!");
-      
+    let provider, signer, contract, tokenContract, account, iface;
+    let selectedColour = null, currentBet = 10;async function connectWallet() {
+      if (!window.ethereum) return alert("MetaMask Daal Bhai!");
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
         account = await signer.getAddress();
 
-        contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        contract = new ethers.Contract(CONTRACT_ADDRESS, FULL_ABI, signer);
         tokenContract = new ethers.Contract(ASIAX_TOKEN, TOKEN_ABI, signer);
+        iface = contract.interface; // ← YE SABSE SAFE METHOD HAI
 
         document.getElementById("connectSection").style.display = "none";
         document.getElementById("gameSection").style.display = "block";
@@ -218,48 +128,35 @@
         await approveIfNeeded();
         updateBalance();
         updateMission();
-        loadHistory();
+        setInterval(() => { updateBalance(); updateMission(); }, 9000);
 
-        setInterval(() => {
-          updateBalance();
-          updateMission();
-        }, 9000);
-
-      } catch (e) {
-        alert("Connect Failed: " + e.message);
-      }
+      } catch (e) { alert("Connect Failed: " + e.message); }
     }
 
     async function approveIfNeeded() {
-      const allowance = await tokenContract.allowance(account, CONTRACT_ADDRESS);
-      if (allowance < ethers.parseUnits("1000000", 18)) {
-        alert("First time? Approving AsiaX Coin...");
-        const tx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.MaxUint256);
-        await tx.wait();
-        alert("Approved! Now Play Freely!");
-      }
+      try {
+        const allowance = await tokenContract.allowance(account, CONTRACT_ADDRESS);
+        if (allowance < ethers.parseUnits("100000", 18)) {
+          alert("Approving AsiaX Token...");
+          const tx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.MaxUint256);
+          await tx.wait();
+          alert("Approved! Ab Khelo!");
+        }
+      } catch(e) {}
     }
 
     async function updateBalance() {
-      if (!tokenContract || !account) return;
-      const bal = await tokenContract.balanceOf(account);
-      document.getElementById("balance").innerText = Number(ethers.formatUnits(bal, 18)).toFixed(2);
+      try {
+        const bal = await tokenContract.balanceOf(account);
+        document.getElementById("balance").innerText = Number(ethers.formatUnits(bal, 18)).toFixed(2);
+      } catch(e) {}
     }
 
-    function setBet(amount) {
-      currentBet = amount;
-      document.querySelectorAll(".bet-btn").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
-    }
-
-    function selectColour(col, el) {
-      selectedColour = col;
-      document.querySelectorAll(".colour").forEach(c => c.classList.remove("selected"));
-      el.classList.add("selected");
-    }
+    function setBet(n) { currentBet = n; document.querySelectorAll(".bet-btn").forEach(b=>b.classList.remove("active")); event.target.classList.add("active"); }
+    function selectColour(c, el) { selectedColour = c; document.querySelectorAll(".colour").forEach(x=>x.classList.remove("selected")); el.classList.add("selected"); }
 
     async function playNow() {
-      if (selectedColour === null) return alert("Colour Select Karo!");
+      if (selectedColour === null) return alert("Colour Choose Kar!");
 
       document.getElementById("playBtn").innerHTML = "PLAYING...";
       document.getElementById("playBtn").disabled = true;
@@ -269,14 +166,18 @@
         const tx = await contract.play(amount, selectedColour);
         const receipt = await tx.wait();
 
-        const event = receipt.logs.find(l => l.topics[0] === ethers.id("ColourResult(address,uint256,bool,uint256,uint8,uint8)"));
-        const decoded = ethers.AbiCoder.defaultAbiCoder().decode(
-          ["address", "uint256", "bool", "uint256", "uint8", "uint8"],
-          event.data
-        );
-
-        const won = decoded[2];
-        const randomColour = Number(decoded[4]);
+        // SABSE SAFE TAREEKA → interface.parseLog()
+        let won = false, randomColour = 0;
+        for (const log of receipt.logs) {
+          try {
+            const parsed = iface.parseLog(log);
+            if (parsed.name === "ColourResult") {
+              won = parsed.args.win;
+              randomColour = Number(parsed.args.random);
+              break;
+            }
+          } catch(e) {} // ignore non-matching logs
+        }
 
         showResult(won, randomColour, currentBet);
         addToHistory(randomColour, won);
@@ -285,44 +186,42 @@
 
       } catch (e) {
         console.error(e);
-        alert("Transaction Failed: " + (e.message || e.reason || "Check gas or approval"));
+        alert("Transaction Failed: " + (e.reason || e.message || "Check gas/approval"));
       }
 
       document.getElementById("playBtn").innerHTML = "PLAY NOW";
       document.getElementById("playBtn").disabled = false;
-    }function showResult(win, colourIndex, betAmount) {
+    }
+
+    function showResult(win, colourIdx, bet) {
       const res = document.getElementById("result");
-      const colours = ["RED", "GREEN", "YELLOW", "BLUE"];
+      const cols = ["RED","GREEN","YELLOW","BLUE"];
       res.style.display = "flex";
       res.className = win ? "result win" : "result lose";
-
       if (win) {
-        const profit = (betAmount * 3.8).toFixed(1);
+        const profit = (bet * 3.8).toFixed(1);
         res.innerHTML = `YOU WON!<br><span style="font-size:2rem">+${profit} ASIAX</span>`;
       } else {
-        res.innerHTML = `LOST!<br>Colour was <b>${colours[colourIndex]}</b>`;
+        res.innerHTML = `LOST!<br>Colour was <b>${cols[colourIdx]}</b>`;
       }
     }
 
-    function addToHistory(colourIndex, won) {
-      const colors = ["R","G","Y","B"];
-      const item = document.createElement("div");
-      item.className = "history-item";
-      item.style.background = won ? "#00ff88" : "#ff0040";
-      item.innerText = colors[colourIndex];
-
-      document.getElementById("historyList").prepend(item);
-      if (document.querySelectorAll(".history-item").length > 20) {
+    function addToHistory(colIdx, win) {
+      const cols = ["R","G","Y","B"];
+      const div = document.createElement("div");div.className = "history-item";
+      div.style.background = win ? "#00ff88" : "#ff0040";
+      div.innerText = cols[colIdx];
+      document.getElementById("historyList").prepend(div);
+      if (document.querySelectorAll(".history-item").length > 20)
         document.querySelector(".history-item:last-child").remove();
-      }
     }
 
     async function updateMission() {
       try {
-        const data = await contract.daily(account);
-        const plays = Number(data.plays);
-        document.getElementById("playsToday").innerText = plays;
-        document.getElementById("progress").style.width = Math.min((plays / 100) * 100, 100) + "%";
+        const d = await contract.daily(account);
+        const p = Number(d.plays);
+        document.getElementById("playsToday").innerText = p;
+        document.getElementById("progress").style.width = Math.min((p/100)*100, 100) + "%";
       } catch(e) {}
     }
 
@@ -330,16 +229,9 @@
       try {
         const tx = await contract.claimDailyReward();
         await tx.wait();
-        alert("Daily Reward Claimed! Check Wallet!");
+        alert("Reward Claimed!");
         updateBalance();
-      } catch(e) {
-        alert("Not eligible yet or already claimed!");
-      }
-    }
-
-    // Auto load history on start
-    async function loadHistory() {
-      // Optional: if you want to show last results from blockchain
+      } catch(e) { alert("Not eligible yet!"); }
     }
   </script>
 </body>
