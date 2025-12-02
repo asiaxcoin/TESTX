@@ -1,238 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ASIAX Colour Game</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AsiaX Colours Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    :root { --bg: linear-gradient(135deg, #0a001f, #1a0033, #000428); --card: rgba(15, 5, 60, 0.85); --glass: rgba(255, 255, 255, 0.08); --border: rgba(0, 212, 255, 0.4); --red: #ff0040; --green: #00ff88; --yellow: #ffff00; --blue: #0088ff; --accent: #00d4ff; --gold: #ffd700; }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background: var(--bg); color: #e8f0ff; font-family: 'Poppins', sans-serif; min-height: 100vh; overflow-x: hidden; }
-    .app { max-width: 420px; margin: 0 auto; padding: 12px; min-height: 100vh; }
-    .header { text-align: center; padding: 16px; border-radius: 25px; background: var(--glass); border: 2px solid var(--border); backdrop-filter: blur(20px); margin-bottom: 16px; box-shadow: 0 10px 30px rgba(0,212,255,0.2); }
-    .logo { height: 55px; filter: drop-shadow(0 0 10px #00d4ff); }
-    .balance-card { background: var(--glass); border-radius: 20px; padding: 18px; text-align: center; border: 2px solid var(--border); backdrop-filter: blur(15px); margin-bottom: 16px; }
-    .balance { font-size: 2.2rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px #ffd700; }
-    .game-card { background: var(--card); border-radius: 28px; padding: 25px; text-align: center; border: 3px solid var(--border); box-shadow: 0 15px 40px rgba(0,212,255,0.3); margin-bottom: 16px; }
-    .title { font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(45deg, #00d4ff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .bet-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
-    .bet-btn { background: rgba(255,255,255,0.1); color: white; border: 2px solid var(--border); padding: 12px 20px; border-radius: 50px; font-weight: bold; transition: all 0.3s; }
-    .bet-btn.active { background: linear-gradient(45deg, #00d4ff, #00ff88); color: black; transform: translateY(-5px); }
-    .colours { display: flex; justify-content: center; gap: 18px; margin: 30px 0; }
-    .colour { width: 95px; height: 95px; border-radius: 50%; font-size: 2.4rem; font-weight: bold; border: 6px solid; box-shadow: 0 0 35px; transition: all 0.4s; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .red { background: var(--red); border-color: #ff3366; box-shadow: 0 0 50px var(--red); }
-    .green { background: #00ff88; border-color: #33ffaa; box-shadow: 0 0 50px var(--green); }
-    .yellow { background: var(--yellow); border-color: #ffff66; box-shadow: 0 0 50px var(--yellow); color: #000; }
-    .blue { background: var(--blue); border-color: #3399ff; box-shadow: 0 0 50px var(--blue); }
-    .colour.selected { transform: scale(1.25); animation: bounce 0.6s; }
-    @keyframes bounce { 0%,100% { transform: scale(1.25); } 50% { transform: scale(1.4); } }
-    .play-btn { background: linear-gradient(45deg, #00ff88, #00d4ff, #ff00aa); color: black; font-weight: 900; font-size: 1.6rem; padding: 20px; border-radius: 60px; border: none; width: 100%; margin: 25px 0; box-shadow: 0 0 50px rgba(0,255,136,0.8); animation: glow 2s infinite; }
-    @keyframes glow { 0%,100% { box-shadow: 0 0 50px rgba(0,255,136,0.8); } 50% { box-shadow: 0 0 80px rgba(0,255,136,1); } }
-    .result { padding: 22px; border-radius: 22px; font-size: 1.7rem; font-weight: 900; margin: 15px 0; min-height: 85px; display: none; align-items: center; justify-content: center; border: 4px solid; animation: pop 0.7s; text-align: center; }@keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-    .win { background: rgba(0,255,136,0.3); border-color: var(--green); color: var(--green); }
-    .lose { background: rgba(255,0,64,0.3); border-color: var(--red); color: var(--red); }
-    .history, .mission { background: var(--glass); border-radius: 18px; padding: 16px; margin: 12px 0; border: 2px solid var(--border); text-align: center; }
-    .history-item { display: inline-flex; width: 45px; height: 45px; border-radius: 50%; margin: 5px; font-size: 1.4rem; line-height: 45px; font-weight: bold; color: black; align-items: center; justify-content: center; }
-    .progress-bar { height: 14px; background: rgba(0,0,0,0.5); border-radius: 7px; overflow: hidden; margin: 10px 0; }
-    .progress { height: 100%; background: linear-gradient(90deg, #ffd700, #ff6b00); border-radius: 7px; width: 0%; transition: width 1s; }
-    .connect-btn { background: linear-gradient(135deg, #00d4ff, #00ff88); color: black; font-weight: 900; padding: 20px; border-radius: 60px; border: none; width: 100%; font-size: 1.5rem; box-shadow: 0 0 50px rgba(0,212,255,0.7); }
+    :root {
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#38d3f1;
+      --muted:#9aa7b2;
+      --glass: rgba(255,255,255,0.03);
+    }
+    * {box-sizing:border-box;font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    html,body {height:100%;margin:0;background:linear-gradient(180deg,#071224 0%, #0b1b2a 100%);color:#e6f0f6}
+    .app {max-width:420px;margin:30px auto;padding:18px}
+    .card {background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(2,6,23,0.6);backdrop-filter:blur(6px)}
+    header {display:flex;align-items:center;gap:12px}
+    
+    .logo-btn {
+      width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;animation: spin 15s linear infinite;box-shadow:0 4px 15px rgba(56,211,241,0.2);
+      transition: all 0.3s ease;border: none;background: none;padding: 0;
+    }
+    .logo-btn:hover {
+      transform: scale(1.1) !important;
+      box-shadow: 0 0 25px rgba(56,211,241,0.5);
+    }
+    .logo-btn img {width:100%;height:100%;border-radius:12px;object-fit:cover;pointer-events:none}
+
+    .title {font-size:28px;font-weight:800}
+    .subtitle {font-size:12px;color:var(--muted);margin-top:2px}
+    .balance {display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+    .bal-left {font-size:13px;color:var(--muted)}
+    .bal-amount {font-weight:700;font-size:18px}
+    .controls {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .input, .select, .btn {
+      width:100%;padding:12px;border-radius:12px;
+      border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit;font-size:15px
+    }
+    .bet-row {display:flex;gap:8px;margin-top:12px}
+    .small {font-size:12px;color:var(--muted)}
+    .result {margin-top:35px;text-align:center}
+    .result .text {font-weight:700;font-size:16px;margin-bottom:8px}
+    .connect {
+      padding:10px 16px;border-radius:10px;border:0;
+      background:linear-gradient(90deg,var(--accent),#02f823);color:#000;font-weight:700;font-size:14px
+    }
+    .play {
+      padding:12px;border-radius:12px;border:0;background:#1352ff;color:#fff;
+      font-weight:800;flex:1;margin-left:8px;font-size:16px
+    }
+    .color-box {
+      width:80px;height:80px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      font-weight:700;color:#fff;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,0.3)
+    }
+    .red {background:#ef4444}
+    .green {background:#22c55e}
+    .yellow {background:#fbbf24;color:#000}
+    .blue {background:#3b82f6}
+    .winner {
+      border:4px solid #fff !important;
+      box-shadow:0 0 30px #fff !important;
+      transform:scale(1.1);
+      animation:glow 1.5s infinite alternate
+    }
+    @keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes glow {from{box-shadow:0 0 20px #fff} to{box-shadow:0 0 40px #fff, 0 0 60px currentColor}}
+    button:disabled {opacity:0.6; cursor:not-allowed}
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <img src="prologo.png" class="logo" alt="ASIAX" />
-      <h3>Colour Prediction Game</h3>
+
+<div class="app">
+  <div class="card">
+    <header>
+      <button class="logo-btn" onclick="goHome()" title="Go to Home">
+        <img src="axcoin.png" alt="AsiaX Logo">
+      </button>
+      <div>
+        <div class="title">𝕏 𝕔𝕠𝕝𝕠𝕦𝕣𝕤 𝕘𝕒𝕞𝕖</div>
+        <div class="subtitle">Fast. Simple. Fair</div>
+      </div>
+    </header>
+    <div class="balance">
+      <div>
+        <div class="bal-left">Your Balance</div>
+        <div class="bal-amount" id="balance">0.00 AX</div>
+      </div>
+      <div style="color:var(--muted);font-size:12px">
+        Player: <span id="playerAddr" style="color:#38d3f1">Not connected</span>
+      </div>
     </div>
 
-    <div id="connectSection">
-      <button onclick="connectWallet()" class="connect-btn">CONNECT WALLET</button>
+    <div class="controls">
+      <select id="choice" class="select">
+        <option value="0">Red</option>
+        <option value="1">Green</option>
+        <option value="2">Yellow</option>
+        <option value="3">Blue</option>
+      </select>
+      <input id="bet" class="input" type="number" min="0.1" step="0.1" placeholder="Bet amount" value="10">
     </div>
 
-    <div id="gameSection" style="display:none;">
-      <div class="balance-card">
-        <div style="font-size:0.95rem; color:#00d4ff;">ASIAX Balance</div>
-        <div class="balance" id="balance">0.00</div>
-        <small>ASIAX • 18 Decimals</small>
-      </div>
+    <div class="bet-row">
+      <button class="connect" id="connectBtn" onclick="connectWallet()">Connect</button>
+      <button class="connect" id="approveBtn" onclick="approveTokens()" style="display:none">Approve</button>
+      <button class="play" id="playBtn" onclick="playGame()">Play</button>
+    </div>
 
-      <div class="game-card">
-        <h2 class="title">PREDICT & WIN BIG</h2>
-        <div class="bet-buttons">
-          <button class="bet-btn active" onclick="setBet(1)">1</button>
-          <button class="bet-btn" onclick="setBet(2)">2</button>
-          <button class="bet-btn" onclick="setBet(5)">5</button>
-          <button class="bet-btn" onclick="setBet(10)">10</button>
-          <button class="bet-btn" onclick="setBet(15)">15</button>
-          <button class="bet-btn" onclick="setBet(20)">20</button>
-        </div>
-
-        <div class="colours">
-          <div class="colour red" onclick="selectColour(0, this)">R</div>
-          <div class="colour green" onclick="selectColour(1, this)">G</div>
-          <div class="colour yellow" onclick="selectColour(2, this)">Y</div>
-          <div class="colour blue" onclick="selectColour(3, this)">B</div>
-        </div>
-
-        <button onclick="playNow()" class="play-btn" id="playBtn">PLAY NOW</button>
-        <div id="result" class="result"></div>
-      </div>
-
-      <div class="history">
-        <strong>Last 20 Results:</strong><br>
-        <div id="historyList" style="margin-top:10px;"></div>
-      </div>
-
-      <div class="mission">
-        <div>Daily Mission: <span id="playsToday">0</span>/100 Plays</div>
-        <div class="progress-bar"><div id="progress" class="progress"></div></div>
-        <button onclick="claimReward()" class="btn btn-warning mt-2">CLAIM REWARD</button>
+    <div class="result">
+      <div id="gameResult" class="text">Select colour & play</div>
+      <div class="small">Winning colour will glow</div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+        <div id="box0" class="color-box red">Red</div>
+        <div id="box1" class="color-box green">Green</div>
+        <div id="box2" class="color-box yellow">Yellow</div>
+        <div id="box3" class="color-box blue">Blue</div>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    // APNA DATA YAHAN DAALO
-    const CONTRACT_ADDRESS = "0xa8Aa262804d7160C3FFf4d7A960254b7Fe768Cf6";  // ← TERA CONTRACT
-    const ASIAX_TOKEN      = "0xe36b5223d488322fac2ddda937e5ab226e83fbbd";               // ← TERA TOKEN
+<script>
+  function goHome() {
+    window.location.href = "ASIAX.PRO";  // ←← YAHAN APNA HOME URL DAAL DO
+    // Ya agar same site pe different page hai to: "index.html" ya "/" daal do
+  }
+  // ←← END →→
 
-    const FULL_ABI = [
-      "function play(uint256 amount, uint8 choice)",
-      "function claimDailyReward()",
-      "function daily(address) view returns (uint256 plays, uint256 lastReset)",
-      "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)"
-    ];
+  let provider, signer, userAccount;
+  let tokenContract, gameContract;
+  let isApproved = false;
 
-    const TOKEN_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"];
+  const TOKEN_ADDRESS = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
+  const GAME_ADDRESS = "0x0C181e6366E1f8a6667a38593bA126DBCb42dCd1";
 
-    let provider, signer, contract, tokenContract, account, iface;
-    let selectedColour = null, currentBet = 10;async function connectWallet() {
-      if (!window.ethereum) return alert("MetaMask Daal Bhai!");
-      try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        account = await signer.getAddress();
+  const tokenABI = [
+    "function balanceOf(address) view returns (uint256)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+    "function approve(address spender, uint256 amount) external returns (bool)"
+  ];
+  const gameABI = [
+    "function play(uint256 amount, uint8 choice) external",
+    "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)"
+  ];
 
-        contract = new ethers.Contract(CONTRACT_ADDRESS, FULL_ABI, signer);
-        tokenContract = new ethers.Contract(ASIAX_TOKEN, TOKEN_ABI, signer);
-        iface = contract.interface; // ← YE SABSE SAFE METHOD HAI
+  async function connectWallet() {
+    if (!window.ethereum) return alert("MetaMask not detected!");
+    try {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      userAccount = await signer.getAddress();
 
-        document.getElementById("connectSection").style.display = "none";
-        document.getElementById("gameSection").style.display = "block";
+      tokenContract = new ethers.Contract(TOKEN_ADDRESS, tokenABI, signer);
+      gameContract = new ethers.Contract(GAME_ADDRESS, gameABI, signer);
 
-        await approveIfNeeded();
-        updateBalance();
-        updateMission();
-        setInterval(() => { updateBalance(); updateMission(); }, 9000);
+      const shortAddr = userAccount.slice(0,6) + "..." + userAccount.slice(-4);
+      document.getElementById("playerAddr").innerText = shortAddr;
+      document.getElementById("connectBtn").innerText = "Connected";
 
-      } catch (e) { alert("Connect Failed: " + e.message); }
+      await Promise.all([updateBalance(), checkAllowance()]);
+      setupEventListener();
+    } catch (err) {
+      alert("Connection failed!");
     }
+  }
 
-    async function approveIfNeeded() {
-      try {
-        const allowance = await tokenContract.allowance(account, CONTRACT_ADDRESS);
-        if (allowance < ethers.parseUnits("100000", 18)) {
-          alert("Approving AsiaX Token...");
-          const tx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.MaxUint256);
-          await tx.wait();
-          alert("Approved! Ab Khelo!");
-        }
-      } catch(e) {}
+  async function updateBalance() {
+    if (!userAccount) return;
+    try {
+      const bal = await tokenContract.balanceOf(userAccount);
+      document.getElementById("balance").innerText = parseFloat(ethers.utils.formatUnits(bal, 18)).toFixed(2) + " AX";
+    } catch (e) {}
+  }
+
+  async function checkAllowance() {
+    if (!userAccount) return;
+    const allowance = await tokenContract.allowance(userAccount, GAME_ADDRESS);
+    const hasEnough = allowance.gte(ethers.utils.parseUnits("1000", 18));
+    isApproved = hasEnough;const approveBtn = document.getElementById("approveBtn");
+    if (!hasEnough) {
+      approveBtn.style.display = "block";
+      approveBtn.innerText = "Approve AX";
+    } else {
+      approveBtn.style.display = "none";
     }
+  }
 
-    async function updateBalance() {
-      try {
-        const bal = await tokenContract.balanceOf(account);
-        document.getElementById("balance").innerText = Number(ethers.formatUnits(bal, 18)).toFixed(2);
-      } catch(e) {}
+  async function approveTokens() {
+    const btn = document.getElementById("approveBtn");
+    btn.disabled = true;
+    btn.innerText = "Approving...";
+
+    try {
+      const tx = await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256);
+      await tx.wait();
+      isApproved = true;
+      btn.style.display = "none";
+      alert("Approval successful! You can now play freely");
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerText = "Approve AX";
+      alert("Approval failed or rejected");
     }
+  }
 
-    function setBet(n) { currentBet = n; document.querySelectorAll(".bet-btn").forEach(b=>b.classList.remove("active")); event.target.classList.add("active"); }
-    function selectColour(c, el) { selectedColour = c; document.querySelectorAll(".colour").forEach(x=>x.classList.remove("selected")); el.classList.add("selected"); }
+  function setupEventListener() {
+    gameContract.on("ColourResult", (player, amount, win, payout, random) => {
+      if (player.toLowerCase() !== userAccount.toLowerCase()) return;
 
-    async function playNow() {
-      if (selectedColour === null) return alert("Colour Choose Kar!");
+      document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
+      document.getElementById("box" + random).classList.add("winner");
 
-      document.getElementById("playBtn").innerHTML = "PLAYING...";
-      document.getElementById("playBtn").disabled = true;
-
-      try {
-        const amount = ethers.parseUnits(currentBet.toString(), 18);
-        const tx = await contract.play(amount, selectedColour);
-        const receipt = await tx.wait();
-
-        // SABSE SAFE TAREEKA → interface.parseLog()
-        let won = false, randomColour = 0;
-        for (const log of receipt.logs) {
-          try {
-            const parsed = iface.parseLog(log);
-            if (parsed.name === "ColourResult") {
-              won = parsed.args.win;
-              randomColour = Number(parsed.args.random);
-              break;
-            }
-          } catch(e) {} // ignore non-matching logs
-        }
-
-        showResult(won, randomColour, currentBet);
-        addToHistory(randomColour, won);
-        updateBalance();
-        updateMission();
-
-      } catch (e) {
-        console.error(e);
-        alert("Transaction Failed: " + (e.reason || e.message || "Check gas/approval"));
-      }
-
-      document.getElementById("playBtn").innerHTML = "PLAY NOW";
-      document.getElementById("playBtn").disabled = false;
-    }
-
-    function showResult(win, colourIdx, bet) {
-      const res = document.getElementById("result");
-      const cols = ["RED","GREEN","YELLOW","BLUE"];
-      res.style.display = "flex";
-      res.className = win ? "result win" : "result lose";
       if (win) {
-        const profit = (bet * 3.8).toFixed(1);
-        res.innerHTML = `YOU WON!<br><span style="font-size:2rem">+${profit} ASIAX</span>`;
+        document.getElementById("gameResult").innerHTML = `You WON ${ethers.utils.formatUnits(payout, 18)} AX!`;
       } else {
-        res.innerHTML = `LOST!<br>Colour was <b>${cols[colourIdx]}</b>`;
+        document.getElementById("gameResult").innerHTML = `Lost this round! Try again`;
       }
-    }
+      updateBalance();
+    });
+  }
 
-    function addToHistory(colIdx, win) {
-      const cols = ["R","G","Y","B"];
-      const div = document.createElement("div");div.className = "history-item";
-      div.style.background = win ? "#00ff88" : "#ff0040";
-      div.innerText = cols[colIdx];
-      document.getElementById("historyList").prepend(div);
-      if (document.querySelectorAll(".history-item").length > 20)
-        document.querySelector(".history-item:last-child").remove();
-    }
+  async function playGame() {
+    if (!userAccount) return alert("Connect wallet first!");
+    if (!isApproved) return alert("Please approve AX tokens first!");
 
-    async function updateMission() {
-      try {
-        const d = await contract.daily(account);
-        const p = Number(d.plays);
-        document.getElementById("playsToday").innerText = p;
-        document.getElementById("progress").style.width = Math.min((p/100)*100, 100) + "%";
-      } catch(e) {}
-    }
+    const choice = document.getElementById("choice").value;
+    const betVal = parseFloat(document.getElementById("bet").value);
+    if (!betVal || betVal < 0.1) return alert("Minimum bet 0.1 AX");
 
-    async function claimReward() {
-      try {
-        const tx = await contract.claimDailyReward();
-        await tx.wait();
-        alert("Reward Claimed!");
-        updateBalance();
-      } catch(e) { alert("Not eligible yet!"); }
+    const playBtn = document.getElementById("playBtn");
+    playBtn.disabled = true;
+    playBtn.innerText = "Playing...";
+
+    try {
+      const amount = ethers.utils.parseUnits(betVal.toString(), 18);
+      const tx = await gameContract.play(amount, choice);
+      document.getElementById("gameResult").innerText = "Transaction sent... waiting for result";
+      await tx.wait();
+    } catch (err) {
+      alert("Transaction failed: " + (err.reason || err.message || "Rejected"));
+      playBtn.disabled = false;
+      playBtn.innerText = "Play";
     }
-  </script>
+  }
+
+  setInterval(() => { if (userAccount) updateBalance(); }, 8000);
+</script>
 </body>
 </html>
