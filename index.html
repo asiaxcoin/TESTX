@@ -13,55 +13,23 @@
     .card {background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:18px;padding:20px;
       box-shadow:0 10px 40px rgba(2,6,23,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);flex:1;display:flex;flex-direction:column;}
     header {display:flex;align-items:center;gap:14px;margin-bottom:16px;}
-
-
-.logo-btn {
-  width: 68px;
-  height: 68px;
-  cursor: pointer;
-  background: transparent !important;   
-  border: none !important;
-  padding: 0;
-  margin: 0;
-  border-radius: 50%;                   
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(56, 211, 241, 0.4);
-  transition: all 0.3s ease;
-}
-
-.logo-btn:hover {
-  transform: scale(1.12);
-  box-shadow: 0 0 30px rgba(56, 211, 241, 0.6);
-}
-
-.logo-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  animation: spin 16s linear infinite;  
-}
-
-    .logo-btn:hover {transform:scale(1.1);}
-    .logo-btn img {width:100%;height:100%;object-fit:cover;}
+    .logo-btn {width:68px;height:68px;cursor:pointer;background:transparent;border:none;padding:0;border-radius:50%;overflow:hidden;
+      box-shadow:0 4px 20px rgba(56,211,241,0.4);transition:all 0.3s;}
+    .logo-btn:hover {transform:scale(1.12);}
+    .logo-btn img {width:100%;height:100%;object-fit:cover;border-radius:50%;animation:spin 16s linear infinite;}
     .title {font-size:30px;font-weight:800;}
     .subtitle {font-size:13px;color:var(--muted);margin-top:3px;}
-
     .balance {background:var(--glass);padding:14px 16px;border-radius:14px;margin-bottom:18px;display:flex;justify-content:space-between;}
     .bal-amount {font-weight:800;font-size:19px;}
-
-    .status {background:var(--glass);padding:12px;border-radius:12px;margin-bottom:16px;font-size:14px;line-height:1.5;}
+    .status {background:var(--glass);padding:14px;border-radius:14px;margin-bottom:16px;font-size:14px;line-height:1.6;}
     .status span {color:var(--accent);font-weight:600;}
-
-    .input, .select {padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:#fff;font-size:16px;width:100%;margin-bottom:12px;}
-
+    .input,.select {padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:#fff;font-size:16px;width:100%;margin-bottom:12px;}
     .btn-row {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
     button {padding:14px 16px;border-radius:14px;border:0;font-weight:800;font-size:16px;cursor:pointer;transition:all 0.3s;}
     .connect {background:linear-gradient(90deg,var(--accent),var(--green));color:#000;}
     .action-btn {background:#8b5cf6;color:#fff;}
     .play {background:#1352ff;color:#fff;}
     .play-again {background:#10b981;color:#fff;width:100%;margin-top:16px;display:none;}
-
     .result {text-align:center;flex:1;display:flex;flex-direction:column;justify-content:flex-end;}
     .result .text {font-size:18px;font-weight:800;margin-bottom:12px;min-height:50px;display:flex;align-items:center;justify-content:center;}
     .small {font-size:13px;color:var(--muted);margin-bottom:16px;}
@@ -71,6 +39,9 @@
     .red {background:#ef4444}.green {background:#22c55e}.yellow {background:#fbbf24;color:#000}.blue {background:#3b82f6}
     .winner {border:4px solid #fff !important;box-shadow:0 0 40px #fff,0 0 80px currentColor !important;transform:scale(1.15);
       animation:glow 1.8s infinite alternate;}
+    .history {display:flex;gap:8px;justify-content:center;margin:16px 0;}
+    .hist {width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;}
+    .income {background:linear-gradient(135deg,#1e40af,#3b82f6);padding:16px;border-radius:14px;text-align:center;margin:16px 0;}.income big {font-size:26px;font-weight:900;color:#38d3f1;}
     @keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
     @keyframes glow {from{box-shadow:0 0 30px #fff} to{box-shadow:0 0 50px #fff,0 0 100px currentColor}}
     button:disabled {opacity:0.6;cursor:not-allowed;}
@@ -86,41 +57,49 @@
       </button>
       <div>
         <div class="title">Colours Game</div>
-        <div class="subtitle">Referral + Rewards Active</div>
+        <div class="subtitle">Play • Earn • Build Team</div>
       </div>
     </header>
+
     <div class="balance">
-      <div><div style="color:var(--muted);font-size:13px">Balance</div><div class="bal-amount" id="balance">0.00 AX</div></div>
+      <div><div style="color:var(--muted);font-size:13px">Wallet Balance</div><div class="bal-amount" id="balance">0.00 AX</div></div>
       <div style="text-align:right"><div style="color:var(--muted);font-size:12px">Player</div><span id="playerAddr" style="color:#38d3f1">Not connected</span></div>
     </div>
 
     <div id="userStatus" class="status" style="display:none">
-      ID: <span id="userId">-</span> | Referrer: <span id="refId">-</span><br>
-      Referrals: <span id="refCount">0</span> | Active: <span id="isActive">No</span> | Qualified: <span id="isQualified">No</span>
+      Your ID: <span id="userId">-</span> | Referrer: <span id="refId">-</span><br>
+      Team: <span id="refCount">0</span> | Active: <span id="isActive">No</span> | Qualified: <span id="isQualified">No</span>
     </div>
 
+    <div id="teamIncome" class="income" style="display:none">
+      <div style="font-size:13px;color:#93c5fd">Total Team Income</div>
+      <div><big id="totalEarned">0.00</big> AX</div>
+    </div>
+
+    <div id="lastResults" class="history" style="display:none"></div>
+
     <div id="joinSection">
-      <input type="number" id="referrerId" class="input" placeholder="Enter Referrer ID (required)" min="1">
+      <input type="number" id="referrerId" class="input" placeholder="Referrer ID (e.g. 2025)" min="2025">
       <div class="btn-row">
-        <button class="connect" id="connectBtn" onclick="connectWallet()">Connect</button>
-        <button class="action-btn" id="joinBtn" onclick="joinWithReferrer()" style="display:none">Join Game</button>
+        <button class="connect" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+        <button class="action-btn" id="joinBtn" onclick="joinGame()" style="display:none">Join Game</button>
       </div>
-      <button class="action-btn" id="payFeeBtn" onclick="payPlatformFee()" style="display:none;width:100%;margin-top:8px">Pay Monthly Fee</button>
+      <button class="action-btn" id="payFeeBtn" onclick="payFee()" style="display:none;width:100%;margin-top:8px">Pay Monthly Fee</button>
     </div>
 
     <div id="gameSection" style="display:none">
-      <div class="controls" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
         <select id="choice" class="select">
           <option value="0">Red</option><option value="1">Green</option><option value="2">Yellow</option><option value="3">Blue</option>
         </select>
-        <input id="bet" class="input" type="number" min="1" step="any" value="10" placeholder="Bet Amount">
+        <input id="bet" class="input" type="number" step="any" value="10" placeholder="Bet Amount">
       </div>
       <button class="play" id="playBtn" onclick="playGame()">Play Now</button>
     </div>
 
     <div class="result">
-      <div id="gameResult" class="text">Connect wallet & join to play!</div>
-      <div class="small">Winning colour will glow</div>
+      <div id="gameResult" class="text">Connect wallet to start!</div>
+      <div class="small">Winning colour will glow!</div>
       <div class="colors">
         <div id="box0" class="color-box red">Red</div>
         <div id="box1" class="color-box green">Green</div>
@@ -135,22 +114,29 @@
 <script>
   let provider, signer, userAccount, tokenContract, gameContract;
   let userId = 0;
+  let last5 = [];
+  let teamIncome = 0;
 
-  // UPDATE THESE WITH YOUR ACTUAL DEPLOYED ADDRESSES
   const TOKEN_ADDRESS = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
   const GAME_ADDRESS = "0x59611d381e5629e479844ccA8119a8e81490C34e";
 
-  const tokenABI = ["function approve(address,uint256) returns(bool)","function balanceOf(address) view returns(uint256)","function allowance(address,address) view returns(uint256)"];
   const gameABI = [
-    "function join(uint256)","function payPlatformFee()","function play(uint256 amount, uint8 choice)",
-    "function getUserByAddress(address) view returns(uint256,uint256,uint256,uint256,bool,bool)",
-    "event UserJoined(address indexed user, uint userId, uint referrerId)",
-    "event PlatformFeePaid(address indexed user, uint userId, uint timestamp)",
-    "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)"
+    "function join(uint256)",
+    "function payPlatformFee()",
+    "function play(uint256 amount, uint8 choice)",
+    "function getUser(address) view returns (uint256 customId, uint256 referrerId, uint256 referralCount, uint256 lastFeePaid, bool isActive, bool isQualified)",
+    "event Played(address indexed player, uint256 amount, bool win, uint256 payout, uint8 choice, uint8 result)",
+    "event FeeDistributed(uint256 feeAmount, uint256 sponsorShare, address indexed sponsor)"
+  ];
+  const tokenABI = [
+    "function approve(address spender, uint256 amount) external returns (bool)",
+    "function balanceOf(address account) external view returns (uint256)",
+    "function allowance(address owner, address spender) external view returns (uint256)"
   ];
 
   async function connectWallet() {
-    if (!window.ethereum) return alert("Install MetaMask!");
+    if (!window.ethereum) return alert("MetaMask not found!");
+
     try {
       provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
@@ -160,29 +146,36 @@
       tokenContract = new ethers.Contract(TOKEN_ADDRESS, tokenABI, signer);
       gameContract = new ethers.Contract(GAME_ADDRESS, gameABI, signer);
 
-      document.getElementById("playerAddr").innerText = userAccount.slice(0,6)+"..."+userAccount.slice(-4);
+      document.getElementById("playerAddr").innerText = userAccount.slice(0,6) + "..." + userAccount.slice(-4);
       document.getElementById("connectBtn").innerText = "Connected";
+      document.getElementById("connectBtn").disabled = true;
       document.getElementById("joinBtn").style.display = "block";
 
-      await updateBalance();
-      await loadUserData();
-    } catch(e) { alert("Connection failed"); }
+      await Promise.all([updateBalance(), loadUser()]);
+      setupListeners();
+    } catch (err) {
+      console.error(err);
+      alert("Wallet connection failed!");
+    }
   }
+
   async function updateBalance() {
     if (!userAccount) return;
-    const bal = await tokenContract.balanceOf(userAccount);
-    document.getElementById("balance").innerText = parseFloat(ethers.utils.formatUnits(bal,18)).toFixed(2) + " AX";
+    try {
+      const bal = await tokenContract.balanceOf(userAccount);
+      document.getElementById("balance").innerText = parseFloat(ethers.utils.formatUnits(bal, 18)).toFixed(2) + " AX";
+    } catch(e) {}
   }
 
-  async function loadUserData() {
+  async function loadUser() {
     try {
-      const data = await gameContract.getUserByAddress(userAccount);
+      const data = await gameContract.getUser(userAccount);
       const [id, refId, refCount, lastPaid, active, qualified] = data;
 
-      if (id > 0) {
-        userId = id;
-        document.getElementById("userId").innerText = id;
-        document.getElementById("refId").innerText = refId;
+      if (id.toString() !== "0") {
+        userId = Number(id);
+        document.getElementById("userId").innerText = "AX" + id;
+        document.getElementById("refId").innerText = refId > 0 ? "AX" + refId : "None";
         document.getElementById("refCount").innerText = refCount;
         document.getElementById("isActive").innerText = active ? "Yes" : "No";
         document.getElementById("isQualified").innerText = qualified ? "Yes" : "No";
@@ -191,66 +184,98 @@
         document.getElementById("joinSection").style.display = "none";
         document.getElementById("gameSection").style.display = active ? "block" : "none";
         document.getElementById("payFeeBtn").style.display = active ? "none" : "block";
-
-        if (active) setupEventListener();
+        document.getElementById("lastResults").style.display = "block";
+        if (refCount > 0) document.getElementById("teamIncome").style.display = "block";
       }
-    } catch(e) { console.log("Not joined yet"); }
+    } catch (err) {
+      console.log("Not joined yet");
+    }
   }
 
-  async function joinWithReferrer() {
-    const refId = document.getElementById("referrerId").value;
-    if (!refId || refId <= 0) return alert("Enter valid Referrer ID");
+  function setupListeners() {
+    gameContract.on("Played", (player, amount, win, payout, choice, result) => {
+      if (player.toLowerCase() !== userAccount.toLowerCase()) return;
+
+      last5.unshift({win: win, color: Number(result)});
+      if (last5.length > 5) last5.pop();
+      updateHistory();
+
+      document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
+      document.getElementById("box" + result).classList.add("winner");
+
+      document.getElementById("gameResult").innerHTML = win
+        ? `WON <big>${ethers.utils.formatUnits(payout,18)}</big> AX!`
+        : "Lost! Try again";
+
+      document.getElementById("playAgainBtn").style.display = "block";
+      updateBalance();
+    });
+
+    gameContract.on("FeeDistributed", (fee, share, sponsor) => {
+      if (sponsor.toLowerCase() === userAccount.toLowerCase() && share > 0) {
+        teamIncome += parseFloat(ethers.utils.formatUnits(share, 18));
+        document.getElementById("totalEarned").innerText = teamIncome.toFixed(4);
+      }
+    });
+  }
+
+  function updateHistory() {
+    const container = document.getElementById("lastResults");container.innerHTML = "";
+    const colors = ["#ef4444","#22c55e","#fbbf24","#3b82f6"];
+    last5.forEach(r => {
+      const d = document.createElement("div");
+      d.className = "hist";
+      d.style.backgroundColor = colors[r.color];
+      d.style.border = r.win ? "3px solid #10b981" : "3px solid #ef4444";
+      d.innerText = r.win ? "W" : "L";
+      container.appendChild(d);
+    });
+  }
+
+  async function joinGame() {
+    const ref = document.getElementById("referrerId").value.trim();
+    if (!ref || ref < 2025) return alert("Enter valid referrer ID");
 
     const btn = document.getElementById("joinBtn");
     btn.disabled = true; btn.innerText = "Joining...";
 
     try {
-      // First approve platform fee (assume you know the fee amount or approve high)
-      await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
-      const tx = await gameContract.join(refId);
+      const allowance = await tokenContract.allowance(userAccount, GAME_ADDRESS);
+      if (allowance.lt(ethers.utils.parseUnits("1000", 18))) {
+        await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
+      }
+      const tx = await gameContract.join(ref);
       await tx.wait();
-      alert("Successfully joined! Welcome to AsiaX Colours");
-      await loadUserData();
-    } catch(e) {
+      alert("Joined! Your ID: AX" + (2025 + 7 * Math.floor((Date.now()/1000 - 1735000000)/300)));
+      await loadUser();
+    } catch (e) {
       alert("Join failed: " + (e.reason || e.message));
       btn.disabled = false; btn.innerText = "Join Game";
     }
   }
 
-  async function payPlatformFee() {
+  async function payFee() {
     const btn = document.getElementById("payFeeBtn");
     btn.disabled = true; btn.innerText = "Paying...";
     try {
-      await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
+      const allowance = await tokenContract.allowance(userAccount, GAME_ADDRESS);
+      if (allowance.lt(ethers.utils.parseUnits("100", 18))) {
+        await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
+      }
       const tx = await gameContract.payPlatformFee();
       await tx.wait();
-      alert("Monthly fee paid! You're active again");
-      await loadUserData();
-    } catch(e) {
-      alert("Payment failed: " + (e.reason || e.message));
+      alert("Monthly fee paid!");
+      await loadUser();
+    } catch (e) {
+      alert("Failed: " + (e.reason || e.message));
       btn.disabled = false; btn.innerText = "Pay Monthly Fee";
     }
-  }
-
-  function setupEventListener() {
-    gameContract.on("ColourResult", (player, amount, win, payout, random) => {
-      if (player.toLowerCase() !== userAccount.toLowerCase()) return;
-      document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
-      document.getElementById("box"+random).classList.add("winner");
-
-      document.getElementById("gameResult").innerHTML = win 
-        ? `You WON ${ethers.utils.formatUnits(payout,18)} AX!`
-        : `Lost! Try again`;
-      
-      document.getElementById("playAgainBtn").style.display = "block";
-      updateBalance();
-    });
   }
 
   async function playGame() {
     const choice = document.getElementById("choice").value;
     const bet = document.getElementById("bet").value;
-    if (!bet || bet < 1) return alert("Enter valid bet");
+    if (!bet || bet <= 0) return alert("Enter amount");
 
     const btn = document.getElementById("playBtn");
     btn.disabled = true; btn.innerText = "Playing...";
@@ -258,13 +283,14 @@
     try {
       const amount = ethers.utils.parseUnits(bet, 18);
       const tx = await gameContract.play(amount, choice);
-      document.getElementById("gameResult").innerText = "Waiting for result...";
+      document.getElementById("gameResult").innerText = "Waiting...";
       await tx.wait();
-    } catch(e) {
+    } catch (e) {
       alert("Play failed: " + (e.reason || e.message));
       btn.disabled = false; btn.innerText = "Play Now";
     }
   }
+
   function playAgain() {
     document.getElementById("playAgainBtn").style.display = "none";
     document.getElementById("gameResult").innerText = "Good luck!";
