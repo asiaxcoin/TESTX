@@ -72,7 +72,7 @@
     </div>
 
     <div id="teamIncome" class="income" style="display:none">
-      <div style="font-size:13px;color:#93c5fd">Total Team Income</div>
+      <div style="font-size:13px;color:#93c5fd">Total Team Income Earned</div>
       <div><big id="totalEarned">0.00</big> AX</div>
     </div>
 
@@ -113,7 +113,6 @@
 
 <script>
   let provider, signer, userAccount, tokenContract, gameContract;
-  let userId = 0;
   let last5 = [];
   let teamIncome = 0;
 
@@ -121,22 +120,18 @@
   const GAME_ADDRESS = "0x59611d381e5629e479844ccA8119a8e81490C34e";
 
   const gameABI = [
-    "function join(uint256)",
+    "function join(uint256 _referrerId)",
     "function payPlatformFee()",
     "function play(uint256 amount, uint8 choice)",
-    "function getUser(address) view returns (uint256 customId, uint256 referrerId, uint256 referralCount, uint256 lastFeePaid, bool isActive, bool isQualified)",
-    "event Played(address indexed player, uint256 amount, bool win, uint256 payout, uint8 choice, uint8 result)",
-    "event FeeDistributed(uint256 feeAmount, uint256 sponsorShare, address indexed sponsor)"
+    "function getUserByAddress(address) view returns (uint256 id, uint256 referrerId, uint256 referralsCount, uint256 lastFeePaid, bool active, bool qualified)",
+    "function getDisplayIdByAddress(address) view returns (string)",
+    "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)",
+    "event HouseFeeDistributed(uint256 feeAmount, uint256 sponsorShare, address sponsor, uint256 houseReceiverShare)"
   ];
-  const tokenABI = [
-    "function approve(address spender, uint256 amount) external returns (bool)",
-    "function balanceOf(address account) external view returns (uint256)",
-    "function allowance(address owner, address spender) external view returns (uint256)"
-  ];
+  const tokenABI = ["function approve(address,uint256) returns(bool)","function balanceOf(address) view returns(uint256)","function allowance(address,address) view returns(uint256)"];
 
   async function connectWallet() {
-    if (!window.ethereum) return alert("MetaMask not found!");
-
+    if (!window.ethereum) return alert("MetaMask install karo!");
     try {
       provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
@@ -146,37 +141,33 @@
       tokenContract = new ethers.Contract(TOKEN_ADDRESS, tokenABI, signer);
       gameContract = new ethers.Contract(GAME_ADDRESS, gameABI, signer);
 
-      document.getElementById("playerAddr").innerText = userAccount.slice(0,6) + "..." + userAccount.slice(-4);
+      document.getElementById("playerAddr").innerText = userAccount.slice(0,6)+"..."+userAccount.slice(-4);
       document.getElementById("connectBtn").innerText = "Connected";
       document.getElementById("connectBtn").disabled = true;
       document.getElementById("joinBtn").style.display = "block";
 
       await Promise.all([updateBalance(), loadUser()]);
       setupListeners();
-    } catch (err) {
-      console.error(err);
-      alert("Wallet connection failed!");
-    }
+    } catch(e) { alert("Connection failed"); }
   }
 
   async function updateBalance() {
     if (!userAccount) return;
     try {
       const bal = await tokenContract.balanceOf(userAccount);
-      document.getElementById("balance").innerText = parseFloat(ethers.utils.formatUnits(bal, 18)).toFixed(2) + " AX";
+      document.getElementById("balance").innerText = parseFloat(ethers.utils.formatUnits(bal,18)).toFixed(2) + " AX";
     } catch(e) {}
   }
 
   async function loadUser() {
     try {
-      const data = await gameContract.getUser(userAccount);
+      const data = await gameContract.getUserByAddress(userAccount);  // ← YEH HI THA PROBLEM
       const [id, refId, refCount, lastPaid, active, qualified] = data;
 
-      if (id.toString() !== "0") {
-        userId = Number(id);
+      if (id > 0) {
         document.getElementById("userId").innerText = "AX" + id;
         document.getElementById("refId").innerText = refId > 0 ? "AX" + refId : "None";
-        document.getElementById("refCount").innerText = refCount;
+        document.getElementById("refCount").innerText = refCount.toString();
         document.getElementById("isActive").innerText = active ? "Yes" : "No";
         document.getElementById("isQualified").innerText = qualified ? "Yes" : "No";
 
@@ -185,110 +176,85 @@
         document.getElementById("gameSection").style.display = active ? "block" : "none";
         document.getElementById("payFeeBtn").style.display = active ? "none" : "block";
         document.getElementById("lastResults").style.display = "block";
-        if (refCount > 0) document.getElementById("teamIncome").style.display = "block";
+        if (refCount > 0 || qualified) document.getElementById("teamIncome").style.display = "block";
       }
-    } catch (err) {
+    } catch(e) {
       console.log("Not joined yet");
     }
   }
 
   function setupListeners() {
-    gameContract.on("Played", (player, amount, win, payout, choice, result) => {
+    gameContract.on("ColourResult", (player, amount, win, payout, random, choice) => {
       if (player.toLowerCase() !== userAccount.toLowerCase()) return;
-
-      last5.unshift({win: win, color: Number(result)});
+      last5.unshift({win, color: Number(random)});
       if (last5.length > 5) last5.pop();
       updateHistory();
-
       document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
-      document.getElementById("box" + result).classList.add("winner");
-
-      document.getElementById("gameResult").innerHTML = win
-        ? `WON <big>${ethers.utils.formatUnits(payout,18)}</big> AX!`
-        : "Lost! Try again";
-
+      document.getElementById("box"+random).classList.add("winner");
+      document.getElementById("gameResult").innerHTML = win ? `WON ${ethers.utils.formatUnits(payout,18)} AX!` : "Lost!";
       document.getElementById("playAgainBtn").style.display = "block";
       updateBalance();
     });
 
-    gameContract.on("FeeDistributed", (fee, share, sponsor) => {
-      if (sponsor.toLowerCase() === userAccount.toLowerCase() && share > 0) {
-        teamIncome += parseFloat(ethers.utils.formatUnits(share, 18));
+    gameContract.on("HouseFeeDistributed", (fee, sponsorShare, sponsor) => {
+      if (sponsor.toLowerCase() === userAccount.toLowerCase() && sponsorShare > 0) {
+        teamIncome += parseFloat(ethers.utils.formatUnits(sponsorShare, 18));
         document.getElementById("totalEarned").innerText = teamIncome.toFixed(4);
       }
     });
   }
 
   function updateHistory() {
-    const container = document.getElementById("lastResults");container.innerHTML = "";
+    const c = document.getElementById("lastResults"); c.innerHTML = "";
     const colors = ["#ef4444","#22c55e","#fbbf24","#3b82f6"];
     last5.forEach(r => {
-      const d = document.createElement("div");
-      d.className = "hist";
+      const d = document.createElement("div"); d.className="hist";
       d.style.backgroundColor = colors[r.color];
       d.style.border = r.win ? "3px solid #10b981" : "3px solid #ef4444";
-      d.innerText = r.win ? "W" : "L";
-      container.appendChild(d);
+      d.innerText = r.win ? "W" : "L"; c.appendChild(d);
     });
   }
-
   async function joinGame() {
-    const ref = document.getElementById("referrerId").value.trim();
-    if (!ref || ref < 2025) return alert("Enter valid referrer ID");
-
-    const btn = document.getElementById("joinBtn");
-    btn.disabled = true; btn.innerText = "Joining...";
-
     try {
-      const allowance = await tokenContract.allowance(userAccount, GAME_ADDRESS);
-      if (allowance.lt(ethers.utils.parseUnits("1000", 18))) {
-        await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
-      }
+      const data = await gameContract.getUserByAddress(userAccount);
+      if (data[0] > 0) { alert("Already joined! Your ID: AX"+data[0]); await loadUser(); return; }
+    } catch(e) {}
+
+    const ref = document.getElementById("referrerId").value.trim();
+    if (!ref || ref < 2025) return alert("Valid Referrer ID daalo");
+
+    const btn = document.getElementById("joinBtn"); btn.disabled=true; btn.innerText="Joining...";
+    try {
+      await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
       const tx = await gameContract.join(ref);
       await tx.wait();
-      alert("Joined! Your ID: AX" + (2025 + 7 * Math.floor((Date.now()/1000 - 1735000000)/300)));
+      alert("Joined ho gaya bhai!");
       await loadUser();
-    } catch (e) {
-      alert("Join failed: " + (e.reason || e.message));
-      btn.disabled = false; btn.innerText = "Join Game";
-    }
+    } catch(e) { alert("Join failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Join Game"; }
   }
 
   async function payFee() {
-    const btn = document.getElementById("payFeeBtn");
-    btn.disabled = true; btn.innerText = "Paying...";
+    const btn = document.getElementById("payFeeBtn"); btn.disabled=true; btn.innerText="Paying...";
     try {
-      const allowance = await tokenContract.allowance(userAccount, GAME_ADDRESS);
-      if (allowance.lt(ethers.utils.parseUnits("100", 18))) {
-        await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
-      }
-      const tx = await gameContract.payPlatformFee();
-      await tx.wait();
+      await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
+      await (await gameContract.payPlatformFee()).wait();
       alert("Monthly fee paid!");
       await loadUser();
-    } catch (e) {
-      alert("Failed: " + (e.reason || e.message));
-      btn.disabled = false; btn.innerText = "Pay Monthly Fee";
-    }
+    } catch(e) { alert("Failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Pay Monthly Fee"; }
   }
 
   async function playGame() {
     const choice = document.getElementById("choice").value;
     const bet = document.getElementById("bet").value;
-    if (!bet || bet <= 0) return alert("Enter amount");
+    if (!bet || bet <= 0) return alert("Amount daalo");
 
-    const btn = document.getElementById("playBtn");
-    btn.disabled = true; btn.innerText = "Playing...";
-
+    const btn = document.getElementById("playBtn"); btn.disabled=true; btn.innerText="Playing...";
     try {
       const amount = ethers.utils.parseUnits(bet, 18);
       const tx = await gameContract.play(amount, choice);
-      document.getElementById("gameResult").innerText = "Waiting...";
+      document.getElementById("gameResult").innerText = "Result aa raha hai...";
       await tx.wait();
-    } catch (e) {
-      alert("Play failed: " + (e.reason || e.message));
-      btn.disabled = false; btn.innerText = "Play Now";
-    }
+    } catch(e) { alert("Play failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Play Now"; }
   }
 
   function playAgain() {
@@ -303,4 +269,3 @@
 </script>
 </body>
 </html>
-
