@@ -6,45 +6,55 @@
   <title>AsiaX Colours Game</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    :root {--bg:#0f1724;--card:#0b1220;--accent:#38d3f1;--green:#02f823;--muted:#9aa7b2;--glass:rgba(255,255,255,0.03);}
-    * {box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
-    body,html {height:100%;background:linear-gradient(180deg,#071224,#0b1b2a);color:#e6f0f6;overflow-x:hidden;}
+    :root {--bg:#0f172a;--card:#1e293b;--accent:#38bdf8;--green:#22c55e;--yellow:#fbbf24;--red:#ef4444;--blue:#3b82f6;--muted:#94a3b8;--glass:rgba(255,255,255,0.05);}
+    * {box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+    body,html {height:100%;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;overflow-x:hidden;}
     .app {min-height:100vh;max-width:480px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;}
-    .card {background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:18px;padding:20px;
-      box-shadow:0 10px 40px rgba(2,6,23,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);flex:1;display:flex;flex-direction:column;}
-    header {display:flex;align-items:center;gap:14px;margin-bottom:16px;}
-    .logo-btn {width:68px;height:68px;cursor:pointer;background:transparent;border:none;padding:0;border-radius:50%;overflow:hidden;
-      box-shadow:0 4px 20px rgba(56,211,241,0.4);transition:all 0.3s;}
-    .logo-btn:hover {transform:scale(1.12);}
-    .logo-btn img {width:100%;height:100%;object-fit:cover;border-radius:50%;animation:spin 16s linear infinite;}
-    .title {font-size:30px;font-weight:800;}
-    .subtitle {font-size:13px;color:var(--muted);margin-top:3px;}
-    .balance {background:var(--glass);padding:14px 16px;border-radius:14px;margin-bottom:18px;display:flex;justify-content:space-between;}
-    .bal-amount {font-weight:800;font-size:19px;}
-    .status {background:var(--glass);padding:14px;border-radius:14px;margin-bottom:16px;font-size:14px;line-height:1.6;}
-    .status span {color:var(--accent);font-weight:600;}
-    .input,.select {padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:#fff;font-size:16px;width:100%;margin-bottom:12px;}
-    .btn-row {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-    button {padding:14px 16px;border-radius:14px;border:0;font-weight:800;font-size:16px;cursor:pointer;transition:all 0.3s;}
-    .connect {background:linear-gradient(90deg,var(--accent),var(--green));color:#000;}
+    .card {background:var(--card);border-radius:20px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);flex:1;display:flex;flex-direction:column;}
+    header {display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+   .logo-btn {
+  width: 68px;
+  height: 68px;
+  cursor: pointer;
+  background: transparent !important;   
+  border: none !important;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;                   
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(56, 211, 241, 0.4);
+  transition: all 0.3s ease;
+}
+    .logo-btn:hover {transform:scale(1.1);box-shadow:0 0 40px rgba(56,189,248,0.8);}
+    .logo-btn img {width:100%;height:100%;object-fit:cover;border-radius:50%;animation:spin 18s linear infinite;}
+    .title {font-size:32px;font-weight:900;color:#fff;letter-spacing:-0.5px;}
+    .subtitle {font-size:14px;color:var(--accent);font-weight:600;margin-top:4px;}
+    .balance {background:var(--glass);padding:16px 20px;border-radius:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(56,189,248,0.2);}
+    .bal-label {font-size:13px;color:var(--muted);}
+    .bal-amount {font-size:22px;font-weight:900;color:#fff;}
+    .status {background:var(--glass);padding:16px;border-radius:16px;margin-bottom:16px;font-size:15px;line-height:1.7;border:1px solid rgba(255,255,255,0.08);}
+    .status span {color:var(--accent);font-weight:700;}
+    .input,.select {padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,0.15);background:var(--glass);color:#fff;font-size:16px;width:100%;margin-bottom:14px;outline:none;transition:0.3s;}
+    .input:focus,.select:focus {border-color:var(--accent);box-shadow:0 0 20px rgba(56,189,248,0.3);}
+    .btn-row {display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+    button {padding:16px 20px;border-radius:16px;border:0;font-weight:800;font-size:17px;cursor:pointer;transition:all 0.3s;letter-spacing:0.5px;}
+    .connect {background:linear-gradient(90deg,var(--accent),#22d3ee);color:#000;}
     .action-btn {background:#8b5cf6;color:#fff;}
-    .play {background:#1352ff;color:#fff;}
-    .play-again {background:#10b981;color:#fff;width:100%;margin-top:16px;display:none;}
+    .play {background:#2563eb;color:#fff;font-size:18px;}
+    .play-again {background:#10b981;color:#fff;width:100%;margin-top:20px;display:none;font-size:18px;}
     .result {text-align:center;flex:1;display:flex;flex-direction:column;justify-content:flex-end;}
-    .result .text {font-size:18px;font-weight:800;margin-bottom:12px;min-height:50px;display:flex;align-items:center;justify-content:center;}
-    .small {font-size:13px;color:var(--muted);margin-bottom:16px;}
-    .colors {display:flex;gap:14px;justify-content:center;margin-bottom:20px;}
-    .color-box {width:78px;height:78px;border-radius:16px;display:flex;align-items:center;justify-content:center;
-      font-weight:800;font-size:15px;color:#fff;box-shadow:0 6px 15px rgba(0,0,0,0.4);transition:all 0.4s;}
+    .result .text {font-size:20px;font-weight:900;margin-bottom:14px;min-height:60px;display:flex;align-items:center;justify-content:center;color:#fff;}
+    .small {font-size:14px;color:var(--muted);margin-bottom:20px;}
+    .colors {display:flex;gap:18px;justify-content:center;margin-bottom:24px;}
+    .color-box {width:82px;height:82px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;box-shadow:0 8px 25px rgba(0,0,0,0.5);transition:all 0.5s;}
     .red {background:#ef4444}.green {background:#22c55e}.yellow {background:#fbbf24;color:#000}.blue {background:#3b82f6}
-    .winner {border:4px solid #fff !important;box-shadow:0 0 40px #fff,0 0 80px currentColor !important;transform:scale(1.15);
-      animation:glow 1.8s infinite alternate;}
-    .history {display:flex;gap:8px;justify-content:center;margin:16px 0;}
-    .hist {width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;}
-    .income {background:linear-gradient(135deg,#1e40af,#3b82f6);padding:16px;border-radius:14px;text-align:center;margin:16px 0;}.income big {font-size:26px;font-weight:900;color:#38d3f1;}
+    .winner {border:5px solid #fff !important;box-shadow:0 0 50px #fff,0 0 100px currentColor !important;transform:scale(1.2);animation:glow 1.5s infinite alternate;}.history {display:flex;gap:10px;justify-content:center;margin:20px 0;overflow-x:auto;padding:10px 0;}
+    .hist {min-width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;box-shadow:0 4px 15px rgba(0,0,0,0.4);}
+    .income {background:linear-gradient(135deg,#1e40af,#3b82f6);padding:20px;border-radius:18px;text-align:center;margin:20px 0;border:1px solid rgba(59,130,246,0.4);box-shadow:0 10px 30px rgba(30,64,175,0.4);}
+    .income big {font-size:32px;font-weight:900;color:#67e8f9;}
     @keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-    @keyframes glow {from{box-shadow:0 0 30px #fff} to{box-shadow:0 0 50px #fff,0 0 100px currentColor}}
-    button:disabled {opacity:0.6;cursor:not-allowed;}
+    @keyframes glow {from{box-shadow:0 0 30px #fff} to{box-shadow:0 0 60px #fff,0 0 120px currentColor}}
+    button:disabled {opacity:0.5;cursor:not-allowed;}
   </style>
 </head>
 <body>
@@ -56,50 +66,53 @@
         <img src="axcoin.png" alt="AsiaX">
       </button>
       <div>
-        <div class="title">Colours Game</div>
-        <div class="subtitle">Play • Earn • Build Team</div>
+        <div class="title">AsiaX Colours</div>
+        <div class="subtitle">Play • Win • Build Team</div>
       </div>
     </header>
 
     <div class="balance">
-      <div><div style="color:var(--muted);font-size:13px">Wallet Balance</div><div class="bal-amount" id="balance">0.00 AX</div></div>
-      <div style="text-align:right"><div style="color:var(--muted);font-size:12px">Player</div><span id="playerAddr" style="color:#38d3f1">Not connected</span></div>
+      <div><div class="bal-label">Wallet Balance</div><div class="bal-amount" id="balance">0.00 AX</div></div>
+      <div style="text-align:right"><div class="bal-label">Player</div><span id="playerAddr" style="color:var(--accent);font-weight:700">Not connected</span></div>
     </div>
 
     <div id="userStatus" class="status" style="display:none">
       Your ID: <span id="userId">-</span> | Referrer: <span id="refId">-</span><br>
-      Team: <span id="refCount">0</span> | Active: <span id="isActive">No</span> | Qualified: <span id="isQualified">No</span>
+      Team Size: <span id="refCount">0</span> | Status: <span id="isActive">Inactive</span> | Qualified: <span id="isQualified">No</span>
     </div>
 
     <div id="teamIncome" class="income" style="display:none">
-      <div style="font-size:13px;color:#93c5fd">Total Team Income Earned</div>
+      <div style="font-size:14px;color:#bfdbfe;margin-bottom:8px;">Total Team Income Earned</div>
       <div><big id="totalEarned">0.00</big> AX</div>
     </div>
 
     <div id="lastResults" class="history" style="display:none"></div>
 
     <div id="joinSection">
-      <input type="number" id="referrerId" class="input" placeholder="Referrer ID (e.g. 2025)" min="2025">
+      <input type="number" id="referrerId" class="input" placeholder="Enter Referrer ID (e.g. 2025)" min="2025">
       <div class="btn-row">
         <button class="connect" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
-        <button class="action-btn" id="joinBtn" onclick="joinGame()" style="display:none">Join Game</button>
+        <button class="action-btn" id="joinBtn" onclick="joinGame()" style="display:none">Join Now</button>
       </div>
-      <button class="action-btn" id="payFeeBtn" onclick="payFee()" style="display:none;width:100%;margin-top:8px">Pay Monthly Fee</button>
+      <button class="action-btn" id="payFeeBtn" onclick="payFee()" style="display:none;width:100%;margin-top:10px">Renew Monthly Fee</button>
     </div>
 
     <div id="gameSection" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
         <select id="choice" class="select">
-          <option value="0">Red</option><option value="1">Green</option><option value="2">Yellow</option><option value="3">Blue</option>
+          <option value="0">Red</option>
+          <option value="1">Green</option>
+          <option value="2">Yellow</option>
+          <option value="3">Blue</option>
         </select>
-        <input id="bet" class="input" type="number" step="any" value="10" placeholder="Bet Amount">
+        <input id="bet" class="input" type="number" step="any" value="10" placeholder="Bet Amount (AX)">
       </div>
-      <button class="play" id="playBtn" onclick="playGame()">Play Now</button>
+      <button class="play" id="playBtn" onclick="playGame()">PLAY NOW</button>
     </div>
 
     <div class="result">
-      <div id="gameResult" class="text">Connect wallet to start!</div>
-      <div class="small">Winning colour will glow!</div>
+      <div id="gameResult" class="text">Connect your wallet to start playing!</div>
+      <div class="small">Winning colour will glow with animation!</div>
       <div class="colors">
         <div id="box0" class="color-box red">Red</div>
         <div id="box1" class="color-box green">Green</div>
@@ -114,24 +127,22 @@
 <script>
   let provider, signer, userAccount, tokenContract, gameContract;
   let last5 = [];
-  let teamIncome = 0;
 
   const TOKEN_ADDRESS = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
   const GAME_ADDRESS = "0x59611d381e5629e479844ccA8119a8e81490C34e";
-
   const gameABI = [
     "function join(uint256 _referrerId)",
     "function payPlatformFee()",
     "function play(uint256 amount, uint8 choice)",
     "function getUserByAddress(address) view returns (uint256 id, uint256 referrerId, uint256 referralsCount, uint256 lastFeePaid, bool active, bool qualified)",
-    "function getDisplayIdByAddress(address) view returns (string)",
     "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)",
-    "event HouseFeeDistributed(uint256 feeAmount, uint256 sponsorShare, address sponsor, uint256 houseReceiverShare)"
+    "event HouseFeeDistributed(uint256 feeAmount, uint256 sponsorShare, address indexed sponsor, uint256 houseReceiverShare)"
   ];
+
   const tokenABI = ["function approve(address,uint256) returns(bool)","function balanceOf(address) view returns(uint256)","function allowance(address,address) view returns(uint256)"];
 
   async function connectWallet() {
-    if (!window.ethereum) return alert("MetaMask install karo!");
+    if (!window.ethereum) return alert("Please install MetaMask!");
     try {
       provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
@@ -146,9 +157,9 @@
       document.getElementById("connectBtn").disabled = true;
       document.getElementById("joinBtn").style.display = "block";
 
-      await Promise.all([updateBalance(), loadUser()]);
+      await Promise.all([updateBalance(), loadUser(), loadTeamIncome()]);
       setupListeners();
-    } catch(e) { alert("Connection failed"); }
+    } catch(e) { alert("Wallet connection failed!"); }
   }
 
   async function updateBalance() {
@@ -161,47 +172,56 @@
 
   async function loadUser() {
     try {
-      const data = await gameContract.getUserByAddress(userAccount);  // ← YEH HI THA PROBLEM
+      const data = await gameContract.getUserByAddress(userAccount);
       const [id, refId, refCount, lastPaid, active, qualified] = data;
 
       if (id > 0) {
         document.getElementById("userId").innerText = "AX" + id;
         document.getElementById("refId").innerText = refId > 0 ? "AX" + refId : "None";
         document.getElementById("refCount").innerText = refCount.toString();
-        document.getElementById("isActive").innerText = active ? "Yes" : "No";
+        document.getElementById("isActive").innerText = active ? "Active" : "Inactive";
         document.getElementById("isQualified").innerText = qualified ? "Yes" : "No";
 
         document.getElementById("userStatus").style.display = "block";
         document.getElementById("joinSection").style.display = "none";
         document.getElementById("gameSection").style.display = active ? "block" : "none";
         document.getElementById("payFeeBtn").style.display = active ? "none" : "block";
-        document.getElementById("lastResults").style.display = "block";
-        if (refCount > 0 || qualified) document.getElementById("teamIncome").style.display = "block";
+        document.getElementById("lastResults").style.display = "flex";
+        if (refCount > 0 || qualified) await loadTeamIncome();
       }
-    } catch(e) {
-      console.log("Not joined yet");
-    }
+    } catch(e) { console.log("Not registered yet"); }
+  }
+
+  async function loadTeamIncome() {
+    try {
+      const filter = gameContract.filters.HouseFeeDistributed(null, null, userAccount);
+      const events = await gameContract.queryFilter(filter, 0, "latest");
+      let total = 0;
+      events.forEach(e => {
+        if (e.args.sponsor.toLowerCase() === userAccount.toLowerCase()) {
+          total += parseFloat(ethers.utils.formatUnits(e.args.sponsorShare, 18));
+        }
+      });
+      if (total > 0) {
+        document.getElementById("totalEarned").innerText = total.toFixed(4);
+        document.getElementById("teamIncome").style.display = "block";
+      }
+    } catch(e) {}
   }
 
   function setupListeners() {
-    gameContract.on("ColourResult", (player, amount, win, payout, random, choice) => {
-      if (player.toLowerCase() !== userAccount.toLowerCase()) return;
+    gameContract.on("ColourResult", (player, amount, win, payout, random, choice) => {if (player.toLowerCase() !== userAccount.toLowerCase()) return;
       last5.unshift({win, color: Number(random)});
       if (last5.length > 5) last5.pop();
       updateHistory();
       document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
       document.getElementById("box"+random).classList.add("winner");
-      document.getElementById("gameResult").innerHTML = win ? `WON ${ethers.utils.formatUnits(payout,18)} AX!` : "Lost!";
+      document.getElementById("gameResult").innerHTML = win ? `YOU WON <big>${ethers.utils.formatUnits(payout,18)}</big> AX!` : "Better Luck Next Time!";
       document.getElementById("playAgainBtn").style.display = "block";
       updateBalance();
     });
 
-    gameContract.on("HouseFeeDistributed", (fee, sponsorShare, sponsor) => {
-      if (sponsor.toLowerCase() === userAccount.toLowerCase() && sponsorShare > 0) {
-        teamIncome += parseFloat(ethers.utils.formatUnits(sponsorShare, 18));
-        document.getElementById("totalEarned").innerText = teamIncome.toFixed(4);
-      }
-    });
+    gameContract.on("HouseFeeDistributed", () => loadTeamIncome());
   }
 
   function updateHistory() {
@@ -210,59 +230,55 @@
     last5.forEach(r => {
       const d = document.createElement("div"); d.className="hist";
       d.style.backgroundColor = colors[r.color];
-      d.style.border = r.win ? "3px solid #10b981" : "3px solid #ef4444";
+      d.style.border = r.win ? "4px solid #10b981" : "4px solid #ef4444";
       d.innerText = r.win ? "W" : "L"; c.appendChild(d);
     });
   }
-  async function joinGame() {
-    try {
-      const data = await gameContract.getUserByAddress(userAccount);
-      if (data[0] > 0) { alert("Already joined! Your ID: AX"+data[0]); await loadUser(); return; }
-    } catch(e) {}
 
+  async function joinGame() {
     const ref = document.getElementById("referrerId").value.trim();
-    if (!ref || ref < 2025) return alert("Valid Referrer ID daalo");
+    if (!ref || ref < 2025) return alert("Please enter a valid Referrer ID (e.g. 2025)");
 
     const btn = document.getElementById("joinBtn"); btn.disabled=true; btn.innerText="Joining...";
     try {
       await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
       const tx = await gameContract.join(ref);
       await tx.wait();
-      alert("Joined ho gaya bhai!");
+      alert("Successfully joined AsiaX Colours Game!");
       await loadUser();
-    } catch(e) { alert("Join failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Join Game"; }
+    } catch(e) { alert("Join failed: " + (e.reason || e.message)); btn.disabled=false; btn.innerText="Join Now"; }
   }
 
   async function payFee() {
-    const btn = document.getElementById("payFeeBtn"); btn.disabled=true; btn.innerText="Paying...";
+    const btn = document.getElementById("payFeeBtn"); btn.disabled=true; btn.innerText="Processing...";
     try {
       await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
       await (await gameContract.payPlatformFee()).wait();
-      alert("Monthly fee paid!");
+      alert("Monthly fee renewed successfully!");
       await loadUser();
-    } catch(e) { alert("Failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Pay Monthly Fee"; }
+    } catch(e) { alert("Payment failed: " + (e.reason || e.message)); btn.disabled=false; btn.innerText="Renew Monthly Fee"; }
   }
 
   async function playGame() {
     const choice = document.getElementById("choice").value;
     const bet = document.getElementById("bet").value;
-    if (!bet || bet <= 0) return alert("Amount daalo");
+    if (!bet || bet <= 0) return alert("Please enter a valid bet amount");
 
     const btn = document.getElementById("playBtn"); btn.disabled=true; btn.innerText="Playing...";
     try {
       const amount = ethers.utils.parseUnits(bet, 18);
       const tx = await gameContract.play(amount, choice);
-      document.getElementById("gameResult").innerText = "Result aa raha hai...";
+      document.getElementById("gameResult").innerText = "Waiting for result...";
       await tx.wait();
-    } catch(e) { alert("Play failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Play Now"; }
+    } catch(e) { alert("Game failed: " + (e.reason || e.message)); btn.disabled=false; btn.innerText="PLAY NOW"; }
   }
 
   function playAgain() {
     document.getElementById("playAgainBtn").style.display = "none";
-    document.getElementById("gameResult").innerText = "Good luck!";
+    document.getElementById("gameResult").innerText = "Choose your colour & bet!";
     document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
     document.getElementById("playBtn").disabled = false;
-    document.getElementById("playBtn").innerText = "Play Now";
+    document.getElementById("playBtn").innerText = "PLAY NOW";
   }
 
   setInterval(() => { if(userAccount) updateBalance(); }, 10000);
