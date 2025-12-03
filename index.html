@@ -39,8 +39,8 @@
     .red {background:#ef4444}.green {background:#22c55e}.yellow {background:#fbbf24;color:#000}.blue {background:#3b82f6}
     .winner {border:4px solid #fff !important;box-shadow:0 0 40px #fff,0 0 80px currentColor !important;transform:scale(1.15);
       animation:glow 1.8s infinite alternate;}
-    .history {display:flex;gap:8px;justify-content:center;margin:16px 0;}
-    .hist {width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;}
+    .history {display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:nowrap;overflow-x:auto;padding:5px 0;}
+    .hist {width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;}
     .income {background:linear-gradient(135deg,#1e40af,#3b82f6);padding:16px;border-radius:14px;text-align:center;margin:16px 0;}
     .income big {font-size:26px;font-weight:900;color:#38d3f1;}
     @keyframes spin {0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
@@ -77,6 +77,7 @@
       <div><big id="totalEarned">0.00</big> AX</div>
     </div>
 
+    <!-- Last Results Left to Right -->
     <div id="lastResults" class="history" style="display:none"></div>
 
     <div id="joinSection">
@@ -115,7 +116,6 @@
 <script>
   let provider, signer, userAccount, tokenContract, gameContract;
   let last5 = [];
-  let teamIncome = 0;
 
   const TOKEN_ADDRESS = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
   const GAME_ADDRESS = "0x59611d381e5629e479844ccA8119a8e81490C34e";
@@ -125,9 +125,8 @@
     "function payPlatformFee()",
     "function play(uint256 amount, uint8 choice)",
     "function getUserByAddress(address) view returns (uint256 id, uint256 referrerId, uint256 referralsCount, uint256 lastFeePaid, bool active, bool qualified)",
-    "function getDisplayIdByAddress(address) view returns (string)",
     "event ColourResult(address indexed player, uint256 amount, bool win, uint256 payout, uint8 random, uint8 playerChoice)",
-    "event HouseFeeDistributed(uint256 feeAmount, uint256 sponsorShare, address sponsor, uint256 houseReceiverShare)"
+    "event HouseFeeDistributed(uint256 feeAmount, uint256 sponsorShare, address indexed sponsor, uint256 houseReceiverShare)"
   ];
   const tokenABI = ["function approve(address,uint256) returns(bool)","function balanceOf(address) view returns(uint256)","function allowance(address,address) view returns(uint256)"];
 
@@ -147,7 +146,7 @@
       document.getElementById("connectBtn").disabled = true;
       document.getElementById("joinBtn").style.display = "block";
 
-      await Promise.all([updateBalance(), loadUser()]);
+      await Promise.all([updateBalance(), loadUser(), loadTeamIncomeFromEvents()]); // Fixed: Team income load
       setupListeners();
     } catch(e) { alert("Connection failed"); }
   }
@@ -176,45 +175,71 @@
         document.getElementById("joinSection").style.display = "none";
         document.getElementById("gameSection").style.display = active ? "block" : "none";
         document.getElementById("payFeeBtn").style.display = active ? "none" : "block";
-        document.getElementById("lastResults").style.display = "block";
-        if (refCount > 0 || qualified) document.getElementById("teamIncome").style.display = "block";
+        document.getElementById("lastResults").style.display = "flex";
+
+        if (refCount > 0 || qualified) {
+          document.getElementById("teamIncome").style.display = "block";
+        }
       }
     } catch(e) {
       console.log("Not joined yet");
     }
   }
 
+  // Fixed: Team income ab contract se fetch hoga → reconnect pe bhi rahega
+  async function loadTeamIncomeFromEvents() {
+    try {
+      const filter = gameContract.filters.HouseFeeDistributed(null, null, userAccount);
+      const events = await gameContract.queryFilter(filter, 0, "latest");
+      let total = 0;
+      events.forEach(event => {
+        if (event.args.sponsor.toLowerCase() === userAccount.toLowerCase()) {
+          total += parseFloat(ethers.utils.formatUnits(event.args.sponsorShare, 18));
+        }
+      });
+      if (total > 0) {
+        document.getElementById("totalEarned").innerText = total.toFixed(4);
+        document.getElementById("teamIncome").style.display = "block";
+      }
+    } catch(e) { console.log("No team income yet"); }
+  }
+
   function setupListeners() {
     gameContract.on("ColourResult", (player, amount, win, payout, random, choice) => {
       if (player.toLowerCase() !== userAccount.toLowerCase()) return;
+
+      // Fixed: Left to Right (unshift → naye results left mein aayenge)
       last5.unshift({win, color: Number(random)});
       if (last5.length > 5) last5.pop();
+
       updateHistory();
-      document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));
-      document.getElementById("box"+random).classList.add("winner");
+      document.querySelectorAll(".color-box").forEach(b => b.classList.remove("winner"));document.getElementById("box"+random).classList.add("winner");
       document.getElementById("gameResult").innerHTML = win ? `WON ${ethers.utils.formatUnits(payout,18)} AX!` : "Lost!";
       document.getElementById("playAgainBtn").style.display = "block";
       updateBalance();
     });
 
-    gameContract.on("HouseFeeDistributed", (fee, sponsorShare, sponsor) => {
-      if (sponsor.toLowerCase() === userAccount.toLowerCase() && sponsorShare > 0) {
-        teamIncome += parseFloat(ethers.utils.formatUnits(sponsorShare, 18));
-        document.getElementById("totalEarned").innerText = teamIncome.toFixed(4);
-      }
+    // Live update team income
+    gameContract.on("HouseFeeDistributed", () => {
+      loadTeamIncomeFromEvents();
     });
   }
 
+  // Fixed: Left to Right (results ab left se right jayenge)
   function updateHistory() {
-    const c = document.getElementById("lastResults"); c.innerHTML = "";
+    const c = document.getElementById("lastResults");
+    c.innerHTML = "";
     const colors = ["#ef4444","#22c55e","#fbbf24","#3b82f6"];
     last5.forEach(r => {
-      const d = document.createElement("div"); d.className="hist";
+      const d = document.createElement("div");
+      d.className = "hist";
       d.style.backgroundColor = colors[r.color];
       d.style.border = r.win ? "3px solid #10b981" : "3px solid #ef4444";
-      d.innerText = r.win ? "W" : "L"; c.appendChild(d);
+      d.innerText = r.win ? "W" : "L";
+      c.appendChild(d); // append → left to right
     });
   }
+
   async function joinGame() {
     try {
       const data = await gameContract.getUserByAddress(userAccount);
@@ -222,14 +247,14 @@
     } catch(e) {}
 
     const ref = document.getElementById("referrerId").value.trim();
-    if (!ref || ref < 2025) return alert("Valid Referrer ID daalo");
+    if (!ref || ref < 2025) return alert("Enter valid Referrer ID");
 
     const btn = document.getElementById("joinBtn"); btn.disabled=true; btn.innerText="Joining...";
     try {
       await (await tokenContract.approve(GAME_ADDRESS, ethers.constants.MaxUint256)).wait();
       const tx = await gameContract.join(ref);
       await tx.wait();
-      alert("Joined ho gaya bhai!");
+      alert("Successfully joined!");
       await loadUser();
     } catch(e) { alert("Join failed: "+(e.reason||e.message)); btn.disabled=false; btn.innerText="Join Game"; }
   }
@@ -247,7 +272,7 @@
   async function playGame() {
     const choice = document.getElementById("choice").value;
     const bet = document.getElementById("bet").value;
-    if (!bet || bet <= 0) return alert("Enter valid bet");
+    if (!bet || bet <= 0) return alert("Enter valid bet amount");
 
     const btn = document.getElementById("playBtn"); btn.disabled=true; btn.innerText="Playing...";
     try {
